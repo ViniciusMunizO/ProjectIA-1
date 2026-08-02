@@ -1,4 +1,27 @@
 {
   "name": "lagune",
-  "entries": []
+  "entries": [
+    {
+      "name": "Signup reveals whether an e-mail is already registered",
+      "paths": [
+        "../server/src/modules/auth/auth.service.ts"
+      ]
+    },
+    {
+      "name": "No Content-Security-Policy or anti-framing response headers",
+      "paths": [
+        "../server/src/app.ts",
+        "vite.config.ts"
+      ]
+    },
+    {
+      "name": "Session lifetime is absolute-only, with no idle timeout or revocation visibility",
+      "paths": [
+        "../server/src/db/schema.sql",
+        "../server/src/modules/auth/auth.repository.ts",
+        "../server/src/modules/auth/auth.service.ts",
+        "../server/src/modules/auth/auth.routes.ts"
+      ]
+    }
+  ]
 }

@@ -1,0 +1,23 @@
+import { existsSync } from 'node:fs';
+import { z } from 'zod';
+
+const envFilePath = new URL('../../.env', import.meta.url);
+if (existsSync(envFilePath)) {
+  process.loadEnvFile(envFilePath);
+}
+
+const envSchema = z.object({
+  PORT: z.coerce.number().int().positive().default(4000),
+  NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+  DATABASE_PATH: z.string().min(1).default('./data/app.db'),
+  COOKIE_SECRET: z.string().min(16, {
+    error: 'COOKIE_SECRET must be at least 16 characters',
+  }),
+  SESSION_TTL_HOURS: z.coerce.number().int().positive().default(24),
+  SESSION_IDLE_TIMEOUT_HOURS: z.coerce.number().int().positive().default(2),
+  CORS_ORIGIN: z.string().min(1).default('http://localhost:5173'),
+});
+
+export const env = envSchema.parse(process.env);
+
+export const isProduction = env.NODE_ENV === 'production';

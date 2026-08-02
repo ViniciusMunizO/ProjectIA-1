@@ -5,4 +5,21 @@ import tailwindcss from '@tailwindcss/vite'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  server: {
+    fs: {
+      allow: ['.', '../shared'],
+    },
+    proxy: {
+      '/api': {
+        target: 'http://localhost:4000',
+        changeOrigin: true,
+      },
+    },
+    headers: {
+      // Anti-framing only: safe to set unconditionally, unlike a full CSP,
+      // since it never restricts which scripts/styles Vite's dev server
+      // (HMR, React Fast Refresh) is allowed to load.
+      'X-Frame-Options': 'SAMEORIGIN',
+    },
+  },
 })

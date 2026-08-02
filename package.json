@@ -1,0 +1,9 @@
+{
+  "private": true,
+  "dependencies": {
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "poku": "^4.5.0"
+  }
+}

@@ -1,4 +1,6 @@
 {
   "name": "lagune",
-  "entries": []
+  "entries": [
+    { "name": "react", "tags": ["Vite", "DOM", "Virtual DOM", "JSX"] }
+  ]
 }
