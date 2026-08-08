@@ -1,21 +1,22 @@
-const ALLOWED_EXTENSIONS = ['.pdf', '.doc', '.docx'];
-const ALLOWED_MIME_TYPES = new Set([
-  'application/pdf',
-  'application/msword',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-]);
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
 
 export type FileValidationResult =
   | { readonly valid: true }
   | { readonly valid: false; readonly reason: string };
 
-const hasAllowedExtension = (fileName: string): boolean =>
-  ALLOWED_EXTENSIONS.some((extension) => fileName.toLowerCase().endsWith(extension));
+const CLIENTE_DOC_EXTENSIONS = ['.pdf', '.jpg', '.jpeg', '.png'];
+const CLIENTE_DOC_MIME_TYPES = new Set(['application/pdf', 'image/jpeg', 'image/png']);
 
-export const validateCadastroFile = (file: File): FileValidationResult => {
-  if (!hasAllowedExtension(file.name) || !ALLOWED_MIME_TYPES.has(file.type)) {
-    return { valid: false, reason: 'Envie um arquivo PDF ou Word (.pdf, .doc, .docx)' };
+// Mirrors the server's magic-byte allowlist (PDF/JPG/PNG) in documento-upload.service.ts.
+// This check is a UX convenience only — the server never trusts the name or
+// declared type and re-verifies the file's actual bytes.
+export const validateClienteDocumento = (file: File): FileValidationResult => {
+  const hasAllowedExtension = CLIENTE_DOC_EXTENSIONS.some((extension) =>
+    file.name.toLowerCase().endsWith(extension),
+  );
+
+  if (!hasAllowedExtension || !CLIENTE_DOC_MIME_TYPES.has(file.type)) {
+    return { valid: false, reason: 'Envie um arquivo PDF, JPG ou PNG' };
   }
 
   if (file.size > MAX_FILE_SIZE_BYTES) {

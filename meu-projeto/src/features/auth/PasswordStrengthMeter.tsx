@@ -28,10 +28,10 @@ const STRENGTH_LABEL: Record<PasswordStrength, string> = {
 };
 
 const STRENGTH_BAR_COLOR: Record<PasswordStrength, string> = {
-  weak: 'bg-red-400',
+  weak: 'bg-[var(--danger)]',
   medium: 'bg-amber-400',
-  strong: 'bg-emerald-400',
-  veryStrong: 'bg-emerald-400',
+  strong: 'bg-[var(--success)]',
+  veryStrong: 'bg-[var(--success)]',
 };
 
 const PendingIcon = () => (

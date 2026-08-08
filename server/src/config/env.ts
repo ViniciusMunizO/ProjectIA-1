@@ -9,7 +9,9 @@ if (existsSync(envFilePath)) {
 const envSchema = z.object({
   PORT: z.coerce.number().int().positive().default(4000),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
-  DATABASE_PATH: z.string().min(1).default('./data/app.db'),
+  SUPABASE_URL: z.url({ error: 'SUPABASE_URL must be a valid URL' }),
+  // Server-only: bypasses row-level security. Never expose to the frontend.
+  SUPABASE_SERVICE_ROLE_KEY: z.string().min(1, { error: 'SUPABASE_SERVICE_ROLE_KEY is required' }),
   COOKIE_SECRET: z.string().min(16, {
     error: 'COOKIE_SECRET must be at least 16 characters',
   }),

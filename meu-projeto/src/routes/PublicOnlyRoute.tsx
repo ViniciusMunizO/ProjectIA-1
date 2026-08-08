@@ -15,7 +15,7 @@ export const PublicOnlyRoute = ({ children }: PublicOnlyRouteProps) => {
   }
 
   if (status === 'authenticated') {
-    return <Navigate to="/cadastro" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
   return children;

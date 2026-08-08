@@ -9,11 +9,18 @@ const nomeSchema = z
 
 const emailSchema = z.email({ error: 'E-mail inválido' }).trim().toLowerCase();
 
+const chaveAcessoSchema = z
+  .string()
+  .trim()
+  .length(8, { error: 'Chave de acesso deve ter 8 caracteres' })
+  .regex(/^[A-Za-z0-9]{8}$/, { error: 'Chave de acesso inválida' });
+
 export const signupSchema = z
   .object({
     nome: nomeSchema,
     email: emailSchema,
     senha: z.string(),
+    chaveAcesso: chaveAcessoSchema,
   })
   .superRefine((data, ctx) => {
     const result = checkPasswordStrength(data.senha, { nome: data.nome, email: data.email });

@@ -32,7 +32,7 @@ export const LoginForm = ({ onSwitchToSignup }: LoginFormProps) => {
       />
 
       {formError ? (
-        <p role="alert" className="text-xs text-red-300">
+        <p role="alert" className="text-xs text-[var(--danger)]">
           {formError}
         </p>
       ) : null}

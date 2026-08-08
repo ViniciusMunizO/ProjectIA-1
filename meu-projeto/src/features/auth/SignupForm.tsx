@@ -15,6 +15,8 @@ export const SignupForm = ({ onSwitchToLogin }: SignupFormProps) => {
     setEmail,
     senha,
     setSenha,
+    chaveAcesso,
+    setChaveAcesso,
     fieldErrors,
     formError,
     isSubmitting,
@@ -54,8 +56,23 @@ export const SignupForm = ({ onSwitchToLogin }: SignupFormProps) => {
 
       <PasswordStrengthMeter result={passwordCheck} hasValue={senha.length > 0} />
 
+      <TextField
+        tone="panel"
+        label="Chave de acesso"
+        type="text"
+        autoComplete="off"
+        placeholder="8 caracteres"
+        maxLength={8}
+        value={chaveAcesso}
+        onChange={(event) => setChaveAcesso(event.target.value)}
+        error={fieldErrors.chaveAcesso}
+      />
+      <p className="-mt-2 text-xs text-[var(--panel-muted)]">
+        Peça a chave de acesso vigente a um administrador.
+      </p>
+
       {formError ? (
-        <p role="alert" className="text-xs text-red-300">
+        <p role="alert" className="text-xs text-[var(--danger)]">
           {formError}
         </p>
       ) : null}

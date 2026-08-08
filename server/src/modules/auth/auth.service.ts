@@ -1,8 +1,10 @@
 import type { User } from '../../../../shared/src/types/auth.types.js';
 import { env } from '../../config/env.js';
-import { AppError, conflict, unauthorized } from '../../lib/http-error.js';
+import { AppError, conflict, forbidden, unauthorized } from '../../lib/http-error.js';
 import { hashPassword, verifyPassword } from '../../lib/password-hash.js';
+import { validateSignupKey } from '../admin/signup-key.service.js';
 import {
+  countUsers,
   createSession,
   createUser,
   deleteSession,
@@ -48,18 +50,43 @@ const clearFailures = (email: string): void => {
 
 const sessionExpiry = (): Date => new Date(Date.now() + env.SESSION_TTL_HOURS * 60 * 60 * 1000);
 
-export const signup = async (nome: string, email: string, senha: string): Promise<User> => {
+const formatDateTimeBR = (iso: string): string =>
+  new Date(iso).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+
+export const signup = async (
+  nome: string,
+  email: string,
+  senha: string,
+  chaveAcesso: string,
+  createdIp: string | null,
+): Promise<User> => {
+  // Bootstrap: an empty users table has no ADMIN to have generated a key in
+  // the first place, so the very first account skips the key check and is
+  // granted ADMIN directly. Every signup after that goes through the normal
+  // key gate, since the count is then nonzero.
+  const isFirstAccount = (await countUsers()) === 0;
+
+  if (!isFirstAccount) {
+    const keyValid = await validateSignupKey(chaveAcesso);
+    if (!keyValid) {
+      throw new AppError(
+        403,
+        'Chave de acesso inválida ou expirada. Peça a um administrador a chave vigente.',
+      );
+    }
+  }
+
   // Hash before checking whether the account exists (rather than after) so
   // the two outcomes take the same time, closing the timing side-channel
   // that would otherwise let the status code alone reveal account existence.
   const passwordHash = await hashPassword(senha);
-  const existing = findUserByEmail(email);
+  const existing = await findUserByEmail(email);
 
   if (existing) {
     throw conflict('E-mail já cadastrado');
   }
 
-  return createUser(nome, email, passwordHash);
+  return createUser(nome, email, passwordHash, null, createdIp, isFirstAccount ? 'ADMIN' : null);
 };
 
 export const login = async (
@@ -70,7 +97,7 @@ export const login = async (
     throw new AppError(429, 'Muitas tentativas. Tente novamente mais tarde.');
   }
 
-  const existing = findUserByEmail(email);
+  const existing = await findUserByEmail(email);
   const passwordMatches = await verifyPassword(existing?.passwordHash ?? null, senha);
 
   if (!existing || !passwordMatches) {
@@ -80,33 +107,52 @@ export const login = async (
 
   clearFailures(email);
 
-  const expiresAt = sessionExpiry();
-  const sessionId = createSession(existing.id, expiresAt);
+  if (existing.blockedUntil && new Date(existing.blockedUntil).getTime() > Date.now()) {
+    throw forbidden(`Sua conta está temporariamente bloqueada até ${formatDateTimeBR(existing.blockedUntil)}.`);
+  }
 
-  return { user: { id: existing.id, nome: existing.nome, email: existing.email, createdAt: existing.createdAt }, sessionId, expiresAt };
+  const expiresAt = sessionExpiry();
+  const sessionId = await createSession(existing.id, expiresAt);
+
+  return {
+    user: {
+      id: existing.id,
+      nome: existing.nome,
+      email: existing.email,
+      role: existing.role,
+      blockedUntil: existing.blockedUntil,
+      createdAt: existing.createdAt,
+    },
+    sessionId,
+    expiresAt,
+  };
 };
 
-export const getUserBySession = (sessionId: string | undefined): User | null => {
+export const getUserBySession = (sessionId: string | undefined): Promise<User | null> => {
   if (!sessionId) {
-    return null;
+    return Promise.resolve(null);
   }
   return findValidSession(sessionId);
 };
 
-export const logout = (sessionId: string | undefined): void => {
+export const logout = async (sessionId: string | undefined): Promise<void> => {
   if (sessionId) {
-    deleteSession(sessionId);
+    await deleteSession(sessionId);
   }
 };
 
-export const createSessionForUser = (userId: string): { sessionId: string; expiresAt: Date } => {
+export const createSessionForUser = async (
+  userId: string,
+): Promise<{ sessionId: string; expiresAt: Date }> => {
   const expiresAt = sessionExpiry();
-  const sessionId = createSession(userId, expiresAt);
+  const sessionId = await createSession(userId, expiresAt);
   return { sessionId, expiresAt };
 };
 
-export const listSessions = (userId: string, currentSessionId: string | undefined): SessionSummary[] =>
-  listSessionsForUser(userId, currentSessionId);
+export const listSessions = (
+  userId: string,
+  currentSessionId: string | undefined,
+): Promise<SessionSummary[]> => listSessionsForUser(userId, currentSessionId);
 
-export const revokeSession = (userId: string, publicId: string): boolean =>
+export const revokeSession = (userId: string, publicId: string): Promise<boolean> =>
   deleteSessionForUser(userId, publicId);

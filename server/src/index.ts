@@ -1,6 +1,5 @@
 import { createApp } from './app.js';
 import { env } from './config/env.js';
-import './db/client.js';
 
 // A bug that escapes Express's own request lifecycle (nothing inside a
 // route handler, which Express 5 already routes to the error middleware)

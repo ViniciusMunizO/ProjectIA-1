@@ -47,7 +47,7 @@ export const TextField = ({
         {...rest}
       />
       {error ? (
-        <p id={errorId} className="text-xs text-red-400" role="alert">
+        <p id={errorId} className="text-xs text-[var(--danger)]" role="alert">
           {error}
         </p>
       ) : null}

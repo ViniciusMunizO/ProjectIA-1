@@ -10,9 +10,9 @@ import { createSessionForUser, listSessions, login, logout, revokeSession, signu
 export const authRouter = Router();
 
 authRouter.post('/signup', signupRateLimit, requireSameOrigin, async (req, res) => {
-  const { nome, email, senha } = signupSchema.parse(req.body);
-  const user = await signup(nome, email, senha);
-  const { sessionId, expiresAt } = createSessionForUser(user.id);
+  const { nome, email, senha, chaveAcesso } = signupSchema.parse(req.body);
+  const user = await signup(nome, email, senha, chaveAcesso, req.ip ?? null);
+  const { sessionId, expiresAt } = await createSessionForUser(user.id);
 
   setSessionCookie(res, sessionId, expiresAt);
   res.status(201).json({ user });
@@ -26,9 +26,9 @@ authRouter.post('/login', loginRateLimit, requireSameOrigin, async (req, res) =>
   res.status(200).json({ user });
 });
 
-authRouter.post('/logout', requireSameOrigin, requireAuth, (req, res) => {
+authRouter.post('/logout', requireSameOrigin, requireAuth, async (req, res) => {
   const sessionId = req.cookies?.[SESSION_COOKIE_NAME] as string | undefined;
-  logout(sessionId);
+  await logout(sessionId);
   clearSessionCookie(res);
   res.status(200).json({ ok: true });
 });
@@ -37,19 +37,19 @@ authRouter.get('/me', (req, res) => {
   res.status(200).json({ user: req.user ?? null });
 });
 
-authRouter.get('/sessions', requireAuth, (req, res) => {
+authRouter.get('/sessions', requireAuth, async (req, res) => {
   const { user } = req;
   if (!user) {
     throw unauthorized();
   }
 
   const currentSessionId = req.cookies?.[SESSION_COOKIE_NAME] as string | undefined;
-  const sessions = listSessions(user.id, currentSessionId);
+  const sessions = await listSessions(user.id, currentSessionId);
 
   res.status(200).json({ sessions });
 });
 
-authRouter.delete('/sessions/:publicId', requireSameOrigin, requireAuth, (req, res) => {
+authRouter.delete('/sessions/:publicId', requireSameOrigin, requireAuth, async (req, res) => {
   const { user } = req;
   if (!user) {
     throw unauthorized();
@@ -61,6 +61,6 @@ authRouter.delete('/sessions/:publicId', requireSameOrigin, requireAuth, (req, r
     return;
   }
 
-  const revoked = revokeSession(user.id, publicId);
+  const revoked = await revokeSession(user.id, publicId);
   res.status(revoked ? 200 : 404).json({ ok: revoked });
 });

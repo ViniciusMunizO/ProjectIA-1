@@ -4,8 +4,11 @@ import express, { type Express } from 'express';
 import { env } from './config/env.js';
 import { errorHandler } from './middleware/error-handler.middleware.js';
 import { sessionMiddleware } from './middleware/session.middleware.js';
+import { adminRouter } from './modules/admin/admin.routes.js';
 import { authRouter } from './modules/auth/auth.routes.js';
-import { cadastroRouter } from './modules/cadastro/cadastro.routes.js';
+import { clientesRouter } from './modules/clientes/clientes.routes.js';
+import { fornecedoresRouter } from './modules/fornecedores/fornecedores.routes.js';
+import { produtosRouter } from './modules/produtos/produtos.routes.js';
 
 export const createApp = (): Express => {
   const app = express();
@@ -28,7 +31,10 @@ export const createApp = (): Express => {
   app.use(sessionMiddleware);
 
   app.use('/api/auth', authRouter);
-  app.use('/api/cadastros', cadastroRouter);
+  app.use('/api/admin', adminRouter);
+  app.use('/api/clientes', clientesRouter);
+  app.use('/api/produtos', produtosRouter);
+  app.use('/api/fornecedores', fornecedoresRouter);
 
   app.use(errorHandler);
 

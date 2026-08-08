@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Logo } from '../../components/ui/Logo';
 import { PillTag } from '../../components/ui/PillTag';
 import { LoginForm } from './LoginForm';
 import { SignupForm } from './SignupForm';
@@ -20,9 +21,7 @@ export const AuthLeftPanel = () => {
 
   return (
     <div className="flex min-h-svh w-full flex-col bg-[var(--panel-bg)] px-6 py-8 sm:px-10 md:w-[52%] md:px-16 md:py-10">
-      <span className="text-sm font-semibold tracking-tight text-[var(--panel-text)]">
-        meu-projeto
-      </span>
+      <Logo tone="panel" />
 
       <div className="flex flex-1 flex-col justify-center py-10">
         <div className="flex max-w-md flex-col gap-8">

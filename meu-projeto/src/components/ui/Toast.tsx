@@ -10,8 +10,8 @@ type ToastProps = {
 };
 
 const VARIANT_CLASSES: Record<ToastVariant, string> = {
-  success: 'border-emerald-400/30 bg-emerald-500/10 text-emerald-100',
-  error: 'border-red-400/30 bg-red-500/10 text-red-100',
+  success: 'border-[var(--success-border)] bg-[var(--success-bg)] text-[var(--success-text)]',
+  error: 'border-[var(--danger-border)] bg-[var(--danger-bg)] text-[var(--danger)]',
 };
 
 export const Toast = ({ message, variant, onDismiss, durationMs = 4000 }: ToastProps) => {
