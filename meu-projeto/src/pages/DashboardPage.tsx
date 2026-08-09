@@ -116,19 +116,29 @@ export const DashboardPage = () => {
             to="/clientes"
           />
           <DashboardTile
-            title="Produtos"
+            title="Produtos/Estoque"
             description="Catálogo de produtos e auditoria."
             icon={<PackageIcon />}
             to="/produtos"
           />
-          <DashboardTile title="Estoque" description="Entradas de estoque por nota." icon={<BoxesIcon />} />
+          <DashboardTile
+            title="Entrada de Produtos"
+            description="Entradas de estoque por nota."
+            icon={<BoxesIcon />}
+            to="/estoque"
+          />
           <DashboardTile
             title="Fornecedores"
             description="Cadastro de fornecedores."
             icon={<TruckIcon />}
             to="/fornecedores"
           />
-          <DashboardTile title="Pedidos" description="Pedidos e orçamentos em PDF." icon={<FileTextIcon />} />
+          <DashboardTile
+            title="Pedidos"
+            description="Pedidos e orçamentos em PDF."
+            icon={<FileTextIcon />}
+            to="/pedidos"
+          />
         </div>
       </main>
     </div>

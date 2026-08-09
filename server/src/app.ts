@@ -8,6 +8,8 @@ import { adminRouter } from './modules/admin/admin.routes.js';
 import { authRouter } from './modules/auth/auth.routes.js';
 import { clientesRouter } from './modules/clientes/clientes.routes.js';
 import { fornecedoresRouter } from './modules/fornecedores/fornecedores.routes.js';
+import { entradasEstoqueRouter } from './modules/estoque/entradas.routes.js';
+import { pedidosRouter } from './modules/pedidos/pedidos.routes.js';
 import { produtosRouter } from './modules/produtos/produtos.routes.js';
 
 export const createApp = (): Express => {
@@ -35,6 +37,8 @@ export const createApp = (): Express => {
   app.use('/api/clientes', clientesRouter);
   app.use('/api/produtos', produtosRouter);
   app.use('/api/fornecedores', fornecedoresRouter);
+  app.use('/api/estoque/entradas', entradasEstoqueRouter);
+  app.use('/api/pedidos', pedidosRouter);
 
   app.use(errorHandler);
 

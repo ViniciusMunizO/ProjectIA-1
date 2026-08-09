@@ -16,6 +16,7 @@ export type Produto = {
   readonly quantidadeCaixa: number;
   readonly controlado: boolean;
   readonly auditado: boolean;
+  readonly quantidadeEstoque: number;
   readonly createdByNome: string | null;
   readonly createdAt: string;
   readonly updatedByNome: string | null;

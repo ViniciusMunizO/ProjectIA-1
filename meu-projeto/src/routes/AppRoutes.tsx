@@ -5,8 +5,12 @@ import { AuthPage } from '../pages/AuthPage';
 import { ClienteNovoPage } from '../pages/ClienteNovoPage';
 import { ClientesListagemPage } from '../pages/ClientesListagemPage';
 import { DashboardPage } from '../pages/DashboardPage';
+import { EstoqueNovoPage } from '../pages/EstoqueNovoPage';
+import { EstoqueListagemPage } from '../pages/EstoqueListagemPage';
 import { FornecedorNovoPage } from '../pages/FornecedorNovoPage';
 import { FornecedoresListagemPage } from '../pages/FornecedoresListagemPage';
+import { PedidoNovoPage } from '../pages/PedidoNovoPage';
+import { PedidosListagemPage } from '../pages/PedidosListagemPage';
 import { ProdutoNovoPage } from '../pages/ProdutoNovoPage';
 import { ProdutosListagemPage } from '../pages/ProdutosListagemPage';
 import { ProtectedRoute } from './ProtectedRoute';
@@ -97,6 +101,46 @@ export const AppRoutes = () => (
         <ProtectedRoute>
           <RequireRole roles={USER_ROLES}>
             <FornecedorNovoPage />
+          </RequireRole>
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/estoque"
+      element={
+        <ProtectedRoute>
+          <RequireRole roles={USER_ROLES}>
+            <EstoqueListagemPage />
+          </RequireRole>
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/estoque/novo"
+      element={
+        <ProtectedRoute>
+          <RequireRole roles={USER_ROLES}>
+            <EstoqueNovoPage />
+          </RequireRole>
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/pedidos"
+      element={
+        <ProtectedRoute>
+          <RequireRole roles={USER_ROLES}>
+            <PedidosListagemPage />
+          </RequireRole>
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/pedidos/novo"
+      element={
+        <ProtectedRoute>
+          <RequireRole roles={USER_ROLES}>
+            <PedidoNovoPage />
           </RequireRole>
         </ProtectedRoute>
       }

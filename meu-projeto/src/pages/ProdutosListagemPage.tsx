@@ -7,13 +7,16 @@ import { ToastViewport } from '../components/ui/ToastViewport';
 import { ProdutoDetailCard } from '../features/produtos/ProdutoDetailCard';
 import { ProdutoFilterBar } from '../features/produtos/ProdutoFilterBar';
 import { EMPTY_FILTERS, filterProdutos, type ProdutoFilters } from '../features/produtos/produto-filters';
+import { computeCustosPorProduto } from '../features/produtos/produto-custos';
 import { useProdutosList } from '../features/produtos/useProdutosList';
+import { useEntradasEstoqueList } from '../features/estoque/useEntradasEstoqueList';
 import { useAuth } from '../hooks/useAuth';
 import { useToasts } from '../hooks/useToasts';
 
 export const ProdutosListagemPage = () => {
   const { user, logout } = useAuth();
   const { produtos, isLoading, error, actionError, replaceProduto, toggleAuditado, refresh } = useProdutosList();
+  const { entradas } = useEntradasEstoqueList();
   const { toasts, pushToast, dismissToast } = useToasts();
   const [filters, setFilters] = useState<ProdutoFilters>(EMPTY_FILTERS);
 
@@ -41,6 +44,11 @@ export const ProdutosListagemPage = () => {
 
   const produtosFiltrados = useMemo(() => filterProdutos(produtos, filters), [produtos, filters]);
 
+  const custosPorProduto = useMemo(() => {
+    const quantidadeCaixaPorProduto = new Map(produtos.map((produto) => [produto.id, produto.quantidadeCaixa]));
+    return computeCustosPorProduto(entradas, quantidadeCaixaPorProduto);
+  }, [produtos, entradas]);
+
   return (
     <div className="min-h-svh bg-[var(--bg)]">
       <ToastViewport toasts={toasts} onDismiss={dismissToast} />
@@ -57,7 +65,7 @@ export const ProdutosListagemPage = () => {
         </div>
       </header>
 
-      <main className="mx-auto flex max-w-5xl flex-col gap-6 px-6 py-10 sm:px-10">
+      <main className="mx-auto flex max-w-7xl flex-col gap-6 px-6 py-10 sm:px-10">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-col gap-2">
             <h1 className="text-balance text-3xl font-medium tracking-tight text-[var(--text-h)]">Produtos</h1>
@@ -100,14 +108,17 @@ export const ProdutosListagemPage = () => {
           </p>
         ) : (
           <div className="overflow-x-auto rounded-2xl border border-[var(--border)]">
-            <table className="w-full min-w-[720px] border-collapse">
+            <table className="w-full min-w-[980px] border-collapse">
               <thead>
                 <tr className="divide-x divide-[var(--border)] border-b border-[var(--border)] text-left text-xs font-medium uppercase tracking-wide text-[var(--panel-muted)]">
                   <th className="px-4 py-3">Código</th>
                   <th className="px-4 py-3">Produto</th>
                   <th className="px-4 py-3">Marca</th>
                   <th className="px-4 py-3">Qtd. caixa</th>
-                  <th className="px-4 py-3">Auditado</th>
+                  <th className="px-4 py-3">Estoque (UN)</th>
+                  <th className="px-4 py-3">Estoque (CX)</th>
+                  <th className="px-4 py-3">Custo (UN)</th>
+                  <th className="px-4 py-3">Custo (CX)</th>
                   <th className="px-4 py-3" />
                 </tr>
               </thead>
@@ -116,6 +127,7 @@ export const ProdutosListagemPage = () => {
                   <ProdutoDetailCard
                     key={produto.id}
                     produto={produto}
+                    custo={custosPorProduto.get(produto.id)}
                     actorRole={user?.role ?? null}
                     onToggleAuditado={toggleAuditado}
                     onUpdated={replaceProduto}

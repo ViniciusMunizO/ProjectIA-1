@@ -15,6 +15,7 @@ type ProdutoRow = {
   quantidade_caixa: number;
   controlado: boolean;
   auditado: boolean;
+  quantidade_estoque: number;
   created_by: string | null;
   created_at: string;
   updated_by: string | null;
@@ -22,7 +23,7 @@ type ProdutoRow = {
 };
 
 const PRODUTO_COLUMNS =
-  'id, codigo, nome, nome_comercial, marca, descricao, categoria, ean, registro_anvisa, codigo_barras, quantidade_caixa, controlado, auditado, created_by, created_at, updated_by, updated_at';
+  'id, codigo, nome, nome_comercial, marca, descricao, categoria, ean, registro_anvisa, codigo_barras, quantidade_caixa, controlado, auditado, quantidade_estoque, created_by, created_at, updated_by, updated_at';
 
 export type NovoProdutoInput = {
   readonly nome: string;
@@ -65,6 +66,7 @@ const toProduto = (row: ProdutoRow, nomeById: ReadonlyMap<string, string>): Prod
   quantidadeCaixa: row.quantidade_caixa,
   controlado: row.controlado,
   auditado: row.auditado,
+  quantidadeEstoque: row.quantidade_estoque,
   createdByNome: row.created_by ? (nomeById.get(row.created_by) ?? null) : null,
   createdAt: row.created_at,
   updatedByNome: row.updated_by ? (nomeById.get(row.updated_by) ?? null) : null,
@@ -95,6 +97,27 @@ export const insertProduto = async (input: NovoProdutoInput, createdBy: string):
 
   const nomeById = await resolveNomeById([createdBy]);
   return toProduto(row, nomeById);
+};
+
+export type ProdutoAuditadoStatus = { readonly nome: string; readonly auditado: boolean };
+
+// Used by modules that consume produtos by id (Entrada de Estoque today) to
+// enforce the Fase 3.1 rule server-side — the caller supplies a produtoId,
+// but whether it may actually be used is server state, not something the
+// client's own search filter can be trusted to have gotten right.
+export const findProdutosAuditadoStatus = async (
+  ids: readonly string[],
+): Promise<ReadonlyMap<string, ProdutoAuditadoStatus>> => {
+  const distinctIds = [...new Set(ids)];
+  if (distinctIds.length === 0) {
+    return new Map();
+  }
+
+  const rows = unwrap(
+    await supabase.from('produtos').select('id, nome, auditado').in('id', distinctIds),
+  ) as Array<{ id: string; nome: string; auditado: boolean }>;
+
+  return new Map(rows.map((row) => [row.id, { nome: row.nome, auditado: row.auditado }]));
 };
 
 export const listProdutos = async (): Promise<Produto[]> => {

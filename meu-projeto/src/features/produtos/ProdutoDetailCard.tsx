@@ -5,11 +5,13 @@ import { Button } from '../../components/ui/Button';
 import { IconCrossfade } from '../../components/ui/IconCrossfade';
 import { anvisaConsultaUrl, categoriaLabel } from '../../lib/produto-labels';
 import { ProdutoEditForm } from './ProdutoEditForm';
+import type { ProdutoCusto } from './produto-custos';
 
-export const PRODUTO_TABLE_COLUMN_COUNT = 6;
+export const PRODUTO_TABLE_COLUMN_COUNT = 9;
 
 type ProdutoDetailCardProps = {
   readonly produto: Produto;
+  readonly custo: ProdutoCusto | undefined;
   readonly actorRole: UserRole | null;
   readonly onToggleAuditado: (id: string, auditado: boolean) => Promise<boolean>;
   readonly onUpdated: (produto: Produto) => void;
@@ -17,6 +19,11 @@ type ProdutoDetailCardProps = {
 
 const formatDateTime = (iso: string): string =>
   new Date(iso).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+
+const formatMoney = (value: number): string => value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+const formatCaixas = (quantidadeEstoque: number, quantidadeCaixa: number): string =>
+  (quantidadeEstoque / quantidadeCaixa).toLocaleString('pt-BR', { maximumFractionDigits: 2 });
 
 const Field = ({ label, value }: { readonly label: string; readonly value: string }) => (
   <div className="flex flex-col gap-0.5">
@@ -52,7 +59,7 @@ const ChevronUpIcon = () => (
   </svg>
 );
 
-export const ProdutoDetailCard = ({ produto, actorRole, onToggleAuditado, onUpdated }: ProdutoDetailCardProps) => {
+export const ProdutoDetailCard = ({ produto, custo, actorRole, onToggleAuditado, onUpdated }: ProdutoDetailCardProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const canAudit = actorRole === 'ADMIN' || actorRole === 'FARMACEUTICO';
@@ -72,11 +79,14 @@ export const ProdutoDetailCard = ({ produto, actorRole, onToggleAuditado, onUpda
         <td className="px-4 py-3 font-medium text-[var(--text-h)]">{produto.nome}</td>
         <td className="px-4 py-3 text-[var(--text)]">{produto.marca}</td>
         <td className="px-4 py-3 tabular-nums text-[var(--text)]">{produto.quantidadeCaixa}</td>
-        <td className="px-4 py-3">
-          <StatusBadge tone={produto.auditado ? 'success' : 'danger'}>
-            {produto.auditado ? 'Auditado' : 'Não auditado'}
-          </StatusBadge>
+        <td className="px-4 py-3 tabular-nums text-[var(--text)]">{produto.quantidadeEstoque}</td>
+        <td className="px-4 py-3 tabular-nums text-[var(--text)]">
+          {formatCaixas(produto.quantidadeEstoque, produto.quantidadeCaixa)}
         </td>
+        <td className="px-4 py-3 tabular-nums text-[var(--text)]">
+          {custo ? formatMoney(custo.custoUnidade) : '—'}
+        </td>
+        <td className="px-4 py-3 tabular-nums text-[var(--text)]">{custo ? formatMoney(custo.custoCaixa) : '—'}</td>
         <td className="px-4 py-3 text-right text-[var(--panel-muted)]">
           <IconCrossfade showFirst={!isExpanded} first={<ChevronDownIcon />} second={<ChevronUpIcon />} className="size-4" />
         </td>
@@ -100,11 +110,12 @@ export const ProdutoDetailCard = ({ produto, actorRole, onToggleAuditado, onUpda
         <tr className="border-b border-[var(--border)]">
           <td colSpan={PRODUTO_TABLE_COLUMN_COUNT} className="px-5 py-5">
             <div className="flex flex-col gap-4">
-              {produto.controlado ? (
-                <div>
-                  <StatusBadge tone="neutral">Controlado</StatusBadge>
-                </div>
-              ) : null}
+              <div className="flex flex-wrap gap-2">
+                <StatusBadge tone={produto.auditado ? 'success' : 'danger'}>
+                  {produto.auditado ? 'Auditado' : 'Não auditado'}
+                </StatusBadge>
+                {produto.controlado ? <StatusBadge tone="neutral">Controlado</StatusBadge> : null}
+              </div>
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <Field label="Nome comercial" value={produto.nomeComercial} />
@@ -128,10 +139,7 @@ export const ProdutoDetailCard = ({ produto, actorRole, onToggleAuditado, onUpda
                   <Field label="Registro ANVISA" value="—" />
                 )}
                 <Field label="Quantidade na caixa" value={String(produto.quantidadeCaixa)} />
-                <Field
-                  label="Em estoque"
-                  value="Ainda não rastreado (disponível após a Fase de Estoque)"
-                />
+                <Field label="Em estoque" value={`${produto.quantidadeEstoque} UN`} />
               </div>
 
               <Field label="Descrição" value={produto.descricao ?? '—'} />

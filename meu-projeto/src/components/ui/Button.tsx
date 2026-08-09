@@ -29,7 +29,7 @@ export const Button = ({
     type={type}
     disabled={disabled || isLoading}
     aria-busy={isLoading}
-    className={`relative inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-5 text-sm font-medium transition-[background-color,filter,opacity] duration-150 ease-out disabled:cursor-not-allowed disabled:opacity-60 ${VARIANT_CLASSES[variant]} ${className}`}
+    className={`relative inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-full px-5 text-sm font-medium transition-[background-color,filter,opacity] duration-150 ease-out disabled:cursor-not-allowed disabled:opacity-60 ${VARIANT_CLASSES[variant]} ${className}`}
     {...rest}
   >
     <span

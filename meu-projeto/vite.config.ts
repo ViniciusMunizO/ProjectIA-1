@@ -9,6 +9,12 @@ export default defineConfig({
     fs: {
       allow: ['.', '../shared'],
     },
+    watch: {
+      // Generated PDFs and debug scripts land in temp/ (e.g. pedido PDFs
+      // mid-write); watching them isn't needed for HMR and Windows can
+      // throw EBUSY on a locked file mid-write, crashing the dev server.
+      ignored: ['**/temp/**'],
+    },
     proxy: {
       '/api': {
         target: 'http://localhost:4000',
