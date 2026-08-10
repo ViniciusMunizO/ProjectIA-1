@@ -28,9 +28,19 @@ jobs:
         with:
           node-version: 24
           cache: npm
-          cache-dependency-path: meu-projeto/package-lock.json
+          cache-dependency-path: |
+            package-lock.json
+            meu-projeto/package-lock.json
 
-      - name: Install dependencies
+      - name: Install root dependencies
+        # shared/ has no package.json of its own — its imports (zod, poku)
+        # resolve through the repo root's node_modules via Node's normal
+        # upward directory walk, since root is shared/'s nearest ancestor
+        # with a lockfile. Without this, tsc fails to find 'zod' while
+        # typechecking meu-projeto (which includes ../shared/src).
+        run: npm ci
+
+      - name: Install frontend dependencies
         working-directory: meu-projeto
         run: npm ci
 
