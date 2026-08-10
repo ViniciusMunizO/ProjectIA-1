@@ -81,6 +81,29 @@ O Vite já faz proxy de `/api` para `http://localhost:4000` em desenvolvimento.
 
 A primeira conta cadastrada na tela de login vira automaticamente ADMIN. Depois disso, novas contas exigem a chave de acesso gerada pelo painel de Usuários.
 
+## Deploy (demonstração)
+
+O frontend vai para o **GitHub Pages** e o backend para o **Render** — são hospedagens separadas porque o Pages só serve arquivos estáticos, e nossa API (sessão via cookie, upload de arquivo, etc.) precisa de um servidor Node de verdade. O banco continua sendo o mesmo projeto Supabase de sempre.
+
+### 1. Backend no Render
+
+1. Em [render.com](https://render.com), **New +** → **Blueprint**, selecione este repositório. O Render lê o `render.yaml` da raiz e propõe o serviço `sistema-vmo-server`.
+2. Preencha as variáveis pedidas (nada disso fica no repositório):
+   - `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` — as mesmas do seu `.env` local
+   - `COOKIE_SECRET` — pode ser um valor novo, só precisa ser longo e aleatório
+   - `CORS_ORIGIN` — a URL do GitHub Pages, algo como `https://SEU-USUARIO.github.io` (sem o `/Sistema-VMO` no final)
+3. Depois do primeiro deploy, copie a URL pública do serviço (ex.: `https://sistema-vmo-server.onrender.com`) — ela é usada no passo 2.
+
+O plano gratuito do Render "dorme" depois de um tempo sem uso: a primeira requisição depois disso demora alguns segundos para acordar o servidor. Normal para demonstração, não use esse plano em produção real.
+
+### 2. Frontend no GitHub Pages
+
+1. Em **Settings → Pages** do repositório no GitHub, em "Build and deployment", mude **Source** para **GitHub Actions** (só precisa fazer isso uma vez).
+2. Em **Settings → Secrets and variables → Actions → Variables**, crie a variável `VITE_API_URL` com o valor `https://sistema-vmo-server.onrender.com/api` (a URL do Render do passo anterior, com `/api` no final).
+3. Dê push na branch `main` (ou rode manualmente o workflow em **Actions → Deploy frontend to GitHub Pages → Run workflow**). O site fica disponível em `https://SEU-USUARIO.github.io/Sistema-VMO/`.
+
+Se mudar `VITE_API_URL` depois, é preciso rodar o workflow de novo (o valor é embutido no build, não lido em tempo de execução).
+
 ## Scripts disponíveis
 
 | Local | Comando | Descrição |

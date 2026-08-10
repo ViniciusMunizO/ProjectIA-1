@@ -1,0 +1,68 @@
+name: Deploy frontend to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'meu-projeto/**'
+      - 'shared/**'
+      - '.github/workflows/deploy-pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: meu-projeto/package-lock.json
+
+      - name: Install dependencies
+        working-directory: meu-projeto
+        run: npm ci
+
+      - name: Build
+        working-directory: meu-projeto
+        # Set in Settings -> Secrets and variables -> Actions -> Variables.
+        # Public API endpoint, not a secret, hence a variable rather than a
+        # secret. Leave unset until the backend is deployed (see render.yaml)
+        # — the build still succeeds, it just won't have a working API to
+        # call at runtime.
+        env:
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
+        run: npm run build
+
+      - name: Add SPA fallback for client-side routing
+        # GitHub Pages has no server-side rewrites: a direct load of e.g.
+        # /produtos would 404 without this. Serving the same index.html for
+        # unmatched paths lets BrowserRouter take over from there.
+        run: cp meu-projeto/dist/index.html meu-projeto/dist/404.html
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: meu-projeto/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

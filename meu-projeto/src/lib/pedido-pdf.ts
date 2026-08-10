@@ -18,7 +18,7 @@ const formatDocumento = (documento: string, tipo: 'CPF' | 'CNPJ'): string =>
 
 const loadLogoDataUrl = async (): Promise<string | null> => {
   try {
-    const response = await fetch('/logo.png');
+    const response = await fetch(`${import.meta.env.BASE_URL}logo.png`);
     if (!response.ok) {
       return null;
     }

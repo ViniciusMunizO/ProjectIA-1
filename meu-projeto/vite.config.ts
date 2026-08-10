@@ -3,7 +3,11 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(({ command }) => ({
+  // GitHub Pages serves this as a project site at /Sistema-VMO/, not at the
+  // domain root — every built asset URL needs that prefix. Dev keeps '/' so
+  // the local server at localhost:5173 is unaffected.
+  base: command === 'build' ? '/Sistema-VMO/' : '/',
   plugins: [react(), tailwindcss()],
   server: {
     fs: {
@@ -28,4 +32,4 @@ export default defineConfig({
       'X-Frame-Options': 'SAMEORIGIN',
     },
   },
-})
+}))

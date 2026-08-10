@@ -17,7 +17,15 @@ const envSchema = z.object({
   }),
   SESSION_TTL_HOURS: z.coerce.number().int().positive().default(24),
   SESSION_IDLE_TIMEOUT_HOURS: z.coerce.number().int().positive().default(2),
-  CORS_ORIGIN: z.string().min(1).default('http://localhost:5173'),
+  // Comma-separated list of allowed origins (e.g. the GitHub Pages URL and
+  // a custom domain at once) — kept as an explicit allowlist, never a
+  // wildcard or a reflected origin, since it's what backs the CSRF defense
+  // in require-same-origin.middleware.ts alongside the custom header check.
+  CORS_ORIGIN: z
+    .string()
+    .min(1)
+    .default('http://localhost:5173')
+    .transform((value) => value.split(',').map((origin) => origin.trim()).filter(Boolean)),
 });
 
 export const env = envSchema.parse(process.env);

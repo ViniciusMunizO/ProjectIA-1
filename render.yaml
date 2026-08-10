@@ -1,0 +1,33 @@
+# Render Blueprint for the Sistema VMO API.
+#
+# Usage: on Render, "New +" -> "Blueprint" -> select this repo. Render reads
+# this file and proposes the service below; you'll be prompted to fill in
+# every env var marked `sync: false` (nothing secret is stored in the repo).
+#
+# After the first deploy, copy the service's public URL (something like
+# https://sistema-vmo-server.onrender.com) — the frontend needs it as
+# VITE_API_URL (see .github/workflows/deploy-pages.yml), and CORS_ORIGIN
+# below needs the frontend's GitHub Pages URL in return.
+services:
+  - type: web
+    name: sistema-vmo-server
+    runtime: node
+    plan: free
+    rootDir: server
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SESSION_TTL_HOURS
+        value: "24"
+      - key: SESSION_IDLE_TIMEOUT_HOURS
+        value: "2"
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: COOKIE_SECRET
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false

@@ -1,5 +1,11 @@
 import type { ApiError } from '../../../shared/src/types/api.types';
 
+// In local dev this stays unset and Vite's own proxy forwards /api to the
+// backend (see vite.config.ts). The deployed build (GitHub Pages) has no
+// server of its own to proxy through, so it needs the backend's absolute
+// URL instead — baked in at build time via this env var.
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? '/api';
+
 export class ApiRequestError extends Error {
   readonly status: number;
   readonly fieldErrors?: ApiError['fieldErrors'];
@@ -14,7 +20,7 @@ export class ApiRequestError extends Error {
 const request = async <T>(path: string, options: RequestInit = {}): Promise<T> => {
   const isMutating = Boolean(options.method) && options.method !== 'GET';
 
-  const response = await fetch(`/api${path}`, {
+  const response = await fetch(`${API_BASE_URL}${path}`, {
     ...options,
     credentials: 'include',
     headers: {
@@ -47,7 +53,7 @@ export const apiDelete = <T>(path: string): Promise<T> => request<T>(path, { met
 // boundary itself. Setting it manually corrupts the boundary and the server
 // fails to parse the body.
 export const apiPostForm = async <T>(path: string, form: FormData): Promise<T> => {
-  const response = await fetch(`/api${path}`, {
+  const response = await fetch(`${API_BASE_URL}${path}`, {
     method: 'POST',
     credentials: 'include',
     headers: { 'X-Requested-With': 'app' },
