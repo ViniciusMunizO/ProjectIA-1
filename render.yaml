@@ -19,7 +19,13 @@ services:
     # meu-projeto. Keeping the build anchored at the actual repo root and
     # using --prefix avoids relying on however Render's rootDir scopes the
     # checkout.
-    buildCommand: npm install && npm install --prefix server && npm run build --prefix server
+    #
+    # --include=dev: Render (like most Node PaaS) skips devDependencies
+    # during install once NODE_ENV=production is set — but typescript and
+    # every @types/* package are devDependencies, and the build step needs
+    # them even though the running server doesn't. Without this flag the
+    # build fails with "Cannot find type definition file for 'node'".
+    buildCommand: npm install --include=dev && npm install --include=dev --prefix server && npm run build --prefix server
     startCommand: npm start --prefix server
     envVars:
       - key: NODE_ENV
