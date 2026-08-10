@@ -1,32 +1,35 @@
-# React + TypeScript + Vite
+# Sistema VMO — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Frontend do Sistema VMO: React 19 + TypeScript + Vite + Tailwind CSS v4.
 
-Currently, two official plugins are available:
+Para visão geral do sistema completo (backend, banco de dados, configuração de ambiente), veja o [README na raiz do repositório](../README.md).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Rodando localmente
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install
+npm run dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+O servidor de desenvolvimento sobe em `http://localhost:5173` e faz proxy de `/api` para a API em `http://localhost:4000` (veja `vite.config.ts`). É necessário ter o backend (`server/`) rodando à parte.
+
+## Scripts
+
+- `npm run dev` — servidor de desenvolvimento com HMR
+- `npm run build` — typecheck (`tsc -b`) seguido do build de produção
+- `npm run lint` — lint com [oxlint](https://oxc.rs)
+- `npm run preview` — serve o build de produção localmente
+
+## Estrutura
+
+```
+src/
+  pages/          uma página por rota (ex.: ProdutosListagemPage.tsx)
+  features/       componentes e hooks específicos de cada módulo de negócio
+  components/ui/  componentes de UI reutilizáveis (Button, TextField, DateField, ...)
+  lib/             clientes de API e utilitários (formatação, máscaras, PDF)
+  routes/         definição de rotas e guards (autenticação, papel do usuário)
+  hooks/          hooks compartilhados (auth, toasts)
+```
+
+Tipos e schemas de validação usados tanto aqui quanto no backend ficam em `../shared/src`, importado diretamente por caminho relativo (não é um pacote npm instalado).
