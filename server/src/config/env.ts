@@ -1,7 +1,14 @@
 import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { z } from 'zod';
 
-const envFilePath = new URL('../../.env', import.meta.url);
+// Resolved from the working directory (server/, whether running tsx from
+// source or the compiled dist/ output) rather than import.meta.url: the
+// compiled file's depth relative to server/ differs from the source file's
+// (dist/server/src/config/env.js vs src/config/env.ts — shared/src being
+// compiled alongside server/src adds a level), so a fixed "../../.env"
+// offset can't be correct for both.
+const envFilePath = resolve(process.cwd(), '.env');
 if (existsSync(envFilePath)) {
   process.loadEnvFile(envFilePath);
 }

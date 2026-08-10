@@ -13,9 +13,14 @@ services:
     name: sistema-vmo-server
     runtime: node
     plan: free
-    rootDir: server
-    buildCommand: npm install && npm run build
-    startCommand: npm start
+    # No rootDir: shared/ has no package.json of its own, so server's build
+    # needs the *repo root's* node_modules too (zod, poku) — same reason
+    # the GitHub Pages workflow installs at the root before building
+    # meu-projeto. Keeping the build anchored at the actual repo root and
+    # using --prefix avoids relying on however Render's rootDir scopes the
+    # checkout.
+    buildCommand: npm install && npm install --prefix server && npm run build --prefix server
+    startCommand: npm start --prefix server
     envVars:
       - key: NODE_ENV
         value: production
