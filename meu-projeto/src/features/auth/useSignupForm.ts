@@ -4,14 +4,13 @@ import { signupSchema } from '../../../../shared/src/schemas/auth.schemas';
 import { ApiRequestError } from '../../lib/api-client';
 import { useAuth } from '../../hooks/useAuth';
 
-type FieldErrors = Partial<Record<'nome' | 'email' | 'senha' | 'chaveAcesso', string>>;
+type FieldErrors = Partial<Record<'nome' | 'email' | 'senha', string>>;
 
 export const useSignupForm = () => {
   const { signup } = useAuth();
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
-  const [chaveAcesso, setChaveAcesso] = useState('');
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -25,14 +24,13 @@ export const useSignupForm = () => {
     event.preventDefault();
     setFormError(null);
 
-    const parsed = signupSchema.safeParse({ nome, email, senha, chaveAcesso });
+    const parsed = signupSchema.safeParse({ nome, email, senha });
     if (!parsed.success) {
       const flattened = parsed.error.flatten().fieldErrors;
       setFieldErrors({
         nome: flattened.nome?.[0],
         email: flattened.email?.[0],
         senha: flattened.senha?.[0],
-        chaveAcesso: flattened.chaveAcesso?.[0],
       });
       return false;
     }
@@ -58,8 +56,6 @@ export const useSignupForm = () => {
     setEmail,
     senha,
     setSenha,
-    chaveAcesso,
-    setChaveAcesso,
     fieldErrors,
     formError,
     isSubmitting,

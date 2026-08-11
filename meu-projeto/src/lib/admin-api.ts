@@ -1,15 +1,6 @@
 import type { UpdateUserInput } from '../../../shared/src/schemas/admin.schemas';
 import type { AdminUserView, User } from '../../../shared/src/types/auth.types';
-import { apiDelete, apiGet, apiPatch, apiPost } from './api-client';
-
-type SignupKeyResponse = {
-  readonly key: string;
-  readonly expiresAt: string;
-};
-
-export const getSignupKey = (): Promise<SignupKeyResponse> => apiGet('/admin/signup-key');
-
-export const rotateSignupKey = (): Promise<SignupKeyResponse> => apiPost('/admin/signup-key/rotate', {});
+import { apiDelete, apiGet, apiPatch } from './api-client';
 
 export const listUsers = (): Promise<{ users: readonly (AdminUserView | User)[] }> =>
   apiGet('/admin/users');

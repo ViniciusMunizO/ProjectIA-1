@@ -2,7 +2,6 @@ import type { User } from '../../../../shared/src/types/auth.types.js';
 import { env } from '../../config/env.js';
 import { AppError, conflict, forbidden, unauthorized } from '../../lib/http-error.js';
 import { hashPassword, verifyPassword } from '../../lib/password-hash.js';
-import { validateSignupKey } from '../admin/signup-key.service.js';
 import {
   countUsers,
   createSession,
@@ -57,24 +56,14 @@ export const signup = async (
   nome: string,
   email: string,
   senha: string,
-  chaveAcesso: string,
   createdIp: string | null,
 ): Promise<User> => {
-  // Bootstrap: an empty users table has no ADMIN to have generated a key in
-  // the first place, so the very first account skips the key check and is
-  // granted ADMIN directly. Every signup after that goes through the normal
-  // key gate, since the count is then nonzero.
+  // Bootstrap: the very first account ever created has no ADMIN/GERENTE to
+  // have granted it a role, so it's the one exception that gets ADMIN
+  // directly. Every signup after that lands with role: null — a self-
+  // registered account has no access to anything (see requireRole) until an
+  // ADMIN or GERENTE assigns it a role from the Usuários panel.
   const isFirstAccount = (await countUsers()) === 0;
-
-  if (!isFirstAccount) {
-    const keyValid = await validateSignupKey(chaveAcesso);
-    if (!keyValid) {
-      throw new AppError(
-        403,
-        'Chave de acesso inválida ou expirada. Peça a um administrador a chave vigente.',
-      );
-    }
-  }
 
   // Hash before checking whether the account exists (rather than after) so
   // the two outcomes take the same time, closing the timing side-channel

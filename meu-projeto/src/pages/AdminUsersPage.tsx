@@ -2,7 +2,6 @@ import { Link } from 'react-router';
 import { Button } from '../components/ui/Button';
 import { Logo } from '../components/ui/Logo';
 import { Spinner } from '../components/ui/Spinner';
-import { SignupKeyPanel } from '../features/admin/SignupKeyPanel';
 import { UsersTable } from '../features/admin/UsersTable';
 import { useUsersAdmin } from '../features/admin/useUsersAdmin';
 import { useAuth } from '../hooks/useAuth';
@@ -34,7 +33,8 @@ export const AdminUsersPage = () => {
           <div className="flex flex-col gap-2">
             <h1 className="text-balance text-3xl font-medium tracking-tight text-[var(--text-h)]">Usuários</h1>
             <p className="text-pretty text-sm text-[var(--text)]">
-              Gerencie contas, papéis e a chave de acesso para autocadastro.
+              Gerencie contas e papéis. Contas recém-criadas ficam sem acesso até receberem um
+              papel.
             </p>
           </div>
           <Link
@@ -44,8 +44,6 @@ export const AdminUsersPage = () => {
             Voltar ao painel
           </Link>
         </div>
-
-        {user.role === 'ADMIN' ? <SignupKeyPanel /> : null}
 
         {actionError ? (
           <p role="alert" className="text-sm text-[var(--danger)]">

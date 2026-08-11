@@ -104,7 +104,7 @@ export const DashboardPage = () => {
           {canManageUsers ? (
             <DashboardTile
               title="Usuários"
-              description="Gerenciar contas, papéis e a chave de acesso."
+              description="Gerenciar contas e papéis."
               icon={<UsersIcon />}
               to="/admin/usuarios"
             />

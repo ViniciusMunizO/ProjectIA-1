@@ -10,8 +10,8 @@ import { createSessionForUser, listSessions, login, logout, revokeSession, signu
 export const authRouter = Router();
 
 authRouter.post('/signup', signupRateLimit, requireSameOrigin, async (req, res) => {
-  const { nome, email, senha, chaveAcesso } = signupSchema.parse(req.body);
-  const user = await signup(nome, email, senha, chaveAcesso, req.ip ?? null);
+  const { nome, email, senha } = signupSchema.parse(req.body);
+  const user = await signup(nome, email, senha, req.ip ?? null);
   const { sessionId, expiresAt } = await createSessionForUser(user.id);
 
   setSessionCookie(res, sessionId, expiresAt);
