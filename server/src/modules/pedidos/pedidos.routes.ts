@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { pedidoSchema } from '../../../../shared/src/schemas/pedido.schemas.js';
-import { USER_ROLES } from '../../../../shared/src/types/auth.types.js';
+import { USER_ROLES, WRITE_ROLES } from '../../../../shared/src/types/auth.types.js';
 import { unauthorized } from '../../lib/http-error.js';
 import { requireAuth } from '../../middleware/require-auth.middleware.js';
 import { requireRole } from '../../middleware/require-role.middleware.js';
@@ -13,7 +13,7 @@ export const pedidosRouter = Router();
 // only a pending (role === null) account is excluded.
 pedidosRouter.use(requireAuth, requireRole(USER_ROLES));
 
-pedidosRouter.post('/', requireSameOrigin, async (req, res) => {
+pedidosRouter.post('/', requireSameOrigin, requireRole(WRITE_ROLES), async (req, res) => {
   const { user } = req;
   if (!user) {
     throw unauthorized();

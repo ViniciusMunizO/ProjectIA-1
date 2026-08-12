@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { Cliente } from '../../../../shared/src/types/cliente.types';
-import type { UserRole } from '../../../../shared/src/types/auth.types';
+import { canWrite, type UserRole } from '../../../../shared/src/types/auth.types';
 import { formatCnpj } from '../../../../shared/src/validators/cnpj';
 import { formatCpf } from '../../../../shared/src/validators/cpf';
 import { Button } from '../../components/ui/Button';
@@ -83,10 +83,9 @@ const DocumentoLink = ({ clienteId }: { readonly clienteId: string }) => {
 export const ClienteDetailRow = ({ cliente, actorRole, onUpdated }: ClienteDetailRowProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  // Any staff member with an assigned role may edit a cliente's data, same
-  // as produtos — there is no restricted sub-action here analogous to
-  // auditado.
-  const canEdit = actorRole !== null;
+  // Any assigned role except CONSULTA (read-only, Nível 1) may edit a
+  // cliente's data.
+  const canEdit = canWrite(actorRole);
 
   return (
     <>

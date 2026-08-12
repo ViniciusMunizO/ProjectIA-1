@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { Fornecedor } from '../../../../shared/src/types/fornecedor.types';
-import type { UserRole } from '../../../../shared/src/types/auth.types';
+import { canWrite, type UserRole } from '../../../../shared/src/types/auth.types';
 import { formatCnpj } from '../../../../shared/src/validators/cnpj';
 import { Button } from '../../components/ui/Button';
 import { IconCrossfade } from '../../components/ui/IconCrossfade';
@@ -39,9 +39,9 @@ const ChevronUpIcon = () => (
 export const FornecedorDetailRow = ({ fornecedor, actorRole, onUpdated }: FornecedorDetailRowProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  // Any staff member with an assigned role may edit a fornecedor's data,
-  // same as clientes/produtos.
-  const canEdit = actorRole !== null;
+  // Any assigned role except CONSULTA (read-only, Nível 1) may edit a
+  // fornecedor's data.
+  const canEdit = canWrite(actorRole);
 
   return (
     <>

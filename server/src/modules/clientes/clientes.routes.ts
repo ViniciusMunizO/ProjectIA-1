@@ -2,7 +2,7 @@ import { Router } from 'express';
 import multer from 'multer';
 import { clienteSchema } from '../../../../shared/src/schemas/cliente.schemas.js';
 import { cnpjLookupParamSchema } from '../../../../shared/src/schemas/cnpj-lookup.schemas.js';
-import { USER_ROLES } from '../../../../shared/src/types/auth.types.js';
+import { USER_ROLES, WRITE_ROLES } from '../../../../shared/src/types/auth.types.js';
 import { notFound, unauthorized } from '../../lib/http-error.js';
 import { requireAuth } from '../../middleware/require-auth.middleware.js';
 import { requireRole } from '../../middleware/require-role.middleware.js';
@@ -25,7 +25,7 @@ export const clientesRouter = Router();
 
 clientesRouter.use(requireAuth, requireRole(ANY_ASSIGNED_ROLE));
 
-clientesRouter.post('/', requireSameOrigin, upload.single('arquivo'), async (req, res) => {
+clientesRouter.post('/', requireSameOrigin, requireRole(WRITE_ROLES), upload.single('arquivo'), async (req, res) => {
   const { user } = req;
   if (!user) {
     throw unauthorized();
@@ -38,7 +38,7 @@ clientesRouter.post('/', requireSameOrigin, upload.single('arquivo'), async (req
   res.status(201).json(result);
 });
 
-clientesRouter.patch('/:id', requireSameOrigin, async (req, res) => {
+clientesRouter.patch('/:id', requireSameOrigin, requireRole(WRITE_ROLES), async (req, res) => {
   const { user } = req;
   const { id } = req.params;
   if (!user || typeof id !== 'string') {

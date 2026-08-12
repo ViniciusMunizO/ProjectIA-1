@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router';
+import { canWrite } from '../../../shared/src/types/auth.types';
 import { Button } from '../components/ui/Button';
 import { Logo } from '../components/ui/Logo';
 import { Spinner } from '../components/ui/Spinner';
@@ -75,9 +76,11 @@ export const FornecedoresListagemPage = () => {
             <Link to="/dashboard" className="text-sm font-medium text-[var(--accent)] underline underline-offset-2">
               Voltar ao painel
             </Link>
-            <Button variant="solid" onClick={() => navigate('/fornecedores/novo')}>
-              + Novo fornecedor
-            </Button>
+            {canWrite(user?.role ?? null) ? (
+              <Button variant="solid" onClick={() => navigate('/fornecedores/novo')}>
+                + Novo fornecedor
+              </Button>
+            ) : null}
           </div>
         </div>
 

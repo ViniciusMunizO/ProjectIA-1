@@ -1,0 +1,16 @@
+-- Adds CONSULTA (Nível 1: read-only everywhere, no create/edit/delete
+-- anywhere, no access to Usuários) to the user_role enum. The other three
+-- assignable roles keep their existing meaning: FUNCIONARIO (Nível 2, full
+-- CRUD except user management), FARMACEUTICO (Nível 3, same as Nível 2 plus
+-- the exclusive produto-auditado toggle), GERENTE/ADMIN (Nível 4, full
+-- control including granting/revoking roles).
+--
+-- Run this once in the Supabase project's SQL Editor (Database > SQL Editor).
+-- Safe to re-run: idempotent (IF NOT EXISTS).
+--
+-- Note: this statement must run alone, not batched with other DDL that
+-- references the new value in the same transaction — Postgres forbids using
+-- an enum value added by ALTER TYPE ... ADD VALUE until that transaction
+-- commits. Nothing else in this file touches CONSULTA, so running the whole
+-- file as one statement is safe.
+alter type user_role add value if not exists 'CONSULTA';

@@ -1,5 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router';
-import { USER_ROLES } from '../../../shared/src/types/auth.types';
+import { USER_ROLES, WRITE_ROLES } from '../../../shared/src/types/auth.types';
 import { AdminUsersPage } from '../pages/AdminUsersPage';
 import { AuthPage } from '../pages/AuthPage';
 import { ClienteNovoPage } from '../pages/ClienteNovoPage';
@@ -59,7 +59,7 @@ export const AppRoutes = () => (
       path="/clientes/novo"
       element={
         <ProtectedRoute>
-          <RequireRole roles={USER_ROLES}>
+          <RequireRole roles={WRITE_ROLES}>
             <ClienteNovoPage />
           </RequireRole>
         </ProtectedRoute>
@@ -79,7 +79,7 @@ export const AppRoutes = () => (
       path="/produtos/novo"
       element={
         <ProtectedRoute>
-          <RequireRole roles={USER_ROLES}>
+          <RequireRole roles={WRITE_ROLES}>
             <ProdutoNovoPage />
           </RequireRole>
         </ProtectedRoute>
@@ -99,7 +99,7 @@ export const AppRoutes = () => (
       path="/fornecedores/novo"
       element={
         <ProtectedRoute>
-          <RequireRole roles={USER_ROLES}>
+          <RequireRole roles={WRITE_ROLES}>
             <FornecedorNovoPage />
           </RequireRole>
         </ProtectedRoute>
@@ -119,7 +119,7 @@ export const AppRoutes = () => (
       path="/estoque/novo"
       element={
         <ProtectedRoute>
-          <RequireRole roles={USER_ROLES}>
+          <RequireRole roles={WRITE_ROLES}>
             <EstoqueNovoPage />
           </RequireRole>
         </ProtectedRoute>
@@ -139,7 +139,7 @@ export const AppRoutes = () => (
       path="/pedidos/novo"
       element={
         <ProtectedRoute>
-          <RequireRole roles={USER_ROLES}>
+          <RequireRole roles={WRITE_ROLES}>
             <PedidoNovoPage />
           </RequireRole>
         </ProtectedRoute>

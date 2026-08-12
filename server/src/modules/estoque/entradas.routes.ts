@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { notaEntradaSchema } from '../../../../shared/src/schemas/entrada-estoque.schemas.js';
-import { USER_ROLES } from '../../../../shared/src/types/auth.types.js';
+import { USER_ROLES, WRITE_ROLES } from '../../../../shared/src/types/auth.types.js';
 import { unauthorized } from '../../lib/http-error.js';
 import { requireAuth } from '../../middleware/require-auth.middleware.js';
 import { requireRole } from '../../middleware/require-role.middleware.js';
@@ -13,7 +13,7 @@ export const entradasEstoqueRouter = Router();
 // a pending (role === null) account is excluded.
 entradasEstoqueRouter.use(requireAuth, requireRole(USER_ROLES));
 
-entradasEstoqueRouter.post('/', requireSameOrigin, async (req, res) => {
+entradasEstoqueRouter.post('/', requireSameOrigin, requireRole(WRITE_ROLES), async (req, res) => {
   const { user } = req;
   if (!user) {
     throw unauthorized();

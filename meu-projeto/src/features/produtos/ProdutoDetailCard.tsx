@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { Produto } from '../../../../shared/src/types/produto.types';
-import type { UserRole } from '../../../../shared/src/types/auth.types';
+import { canWrite, type UserRole } from '../../../../shared/src/types/auth.types';
 import { Button } from '../../components/ui/Button';
 import { IconCrossfade } from '../../components/ui/IconCrossfade';
 import { anvisaConsultaUrl, categoriaLabel } from '../../lib/produto-labels';
@@ -63,10 +63,10 @@ export const ProdutoDetailCard = ({ produto, custo, actorRole, onToggleAuditado,
   const [isExpanded, setIsExpanded] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const canAudit = actorRole === 'ADMIN' || actorRole === 'FARMACEUTICO';
-  // Any staff member with an assigned role may edit a product's general
-  // data; the auditado toggle above is the one action still gated to
-  // ADMIN/FARMACEUTICO per the Fase 3 business rule.
-  const canEdit = actorRole !== null;
+  // Any assigned role except CONSULTA (read-only, Nível 1) may edit a
+  // product's general data; the auditado toggle above is the one action
+  // still gated to ADMIN/FARMACEUTICO per the Fase 3 business rule.
+  const canEdit = canWrite(actorRole);
 
   return (
     <>

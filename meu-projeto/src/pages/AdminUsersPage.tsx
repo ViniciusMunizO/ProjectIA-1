@@ -2,6 +2,7 @@ import { Link } from 'react-router';
 import { Button } from '../components/ui/Button';
 import { Logo } from '../components/ui/Logo';
 import { Spinner } from '../components/ui/Spinner';
+import { PermissionLevelsLegend } from '../features/admin/PermissionLevelsLegend';
 import { UsersTable } from '../features/admin/UsersTable';
 import { useUsersAdmin } from '../features/admin/useUsersAdmin';
 import { useAuth } from '../hooks/useAuth';
@@ -44,6 +45,8 @@ export const AdminUsersPage = () => {
             Voltar ao painel
           </Link>
         </div>
+
+        <PermissionLevelsLegend />
 
         {actionError ? (
           <p role="alert" className="text-sm text-[var(--danger)]">

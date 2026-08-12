@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { auditadoSchema, produtoSchema } from '../../../../shared/src/schemas/produto.schemas.js';
-import { USER_ROLES } from '../../../../shared/src/types/auth.types.js';
+import { USER_ROLES, WRITE_ROLES } from '../../../../shared/src/types/auth.types.js';
 import { unauthorized } from '../../lib/http-error.js';
 import { requireAuth } from '../../middleware/require-auth.middleware.js';
 import { requireRole } from '../../middleware/require-role.middleware.js';
@@ -13,7 +13,7 @@ export const produtosRouter = Router();
 // auditado toggle narrows further to ADMIN/FARMACEUTICO inside the route.
 produtosRouter.use(requireAuth, requireRole(USER_ROLES));
 
-produtosRouter.post('/', requireSameOrigin, async (req, res) => {
+produtosRouter.post('/', requireSameOrigin, requireRole(WRITE_ROLES), async (req, res) => {
   const { user } = req;
   if (!user) {
     throw unauthorized();
@@ -29,7 +29,7 @@ produtosRouter.get('/', async (_req, res) => {
   res.status(200).json({ produtos });
 });
 
-produtosRouter.patch('/:id', requireSameOrigin, async (req, res) => {
+produtosRouter.patch('/:id', requireSameOrigin, requireRole(WRITE_ROLES), async (req, res) => {
   const { user } = req;
   const { id } = req.params;
   if (!user || typeof id !== 'string') {
@@ -41,7 +41,7 @@ produtosRouter.patch('/:id', requireSameOrigin, async (req, res) => {
   res.status(200).json({ produto });
 });
 
-produtosRouter.patch('/:id/auditado', requireSameOrigin, async (req, res) => {
+produtosRouter.patch('/:id/auditado', requireSameOrigin, requireRole(WRITE_ROLES), async (req, res) => {
   const { user } = req;
   const { id } = req.params;
   if (!user || typeof id !== 'string') {

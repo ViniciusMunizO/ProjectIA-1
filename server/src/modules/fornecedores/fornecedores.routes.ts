@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { fornecedorSchema } from '../../../../shared/src/schemas/fornecedor.schemas.js';
 import { cnpjLookupParamSchema } from '../../../../shared/src/schemas/cnpj-lookup.schemas.js';
-import { USER_ROLES } from '../../../../shared/src/types/auth.types.js';
+import { USER_ROLES, WRITE_ROLES } from '../../../../shared/src/types/auth.types.js';
 import { lookupCnpj } from '../../lib/cnpj-lookup.service.js';
 import { unauthorized } from '../../lib/http-error.js';
 import { requireAuth } from '../../middleware/require-auth.middleware.js';
@@ -15,7 +15,7 @@ export const fornecedoresRouter = Router();
 // pending (role === null) account is excluded.
 fornecedoresRouter.use(requireAuth, requireRole(USER_ROLES));
 
-fornecedoresRouter.post('/', requireSameOrigin, async (req, res) => {
+fornecedoresRouter.post('/', requireSameOrigin, requireRole(WRITE_ROLES), async (req, res) => {
   const { user } = req;
   if (!user) {
     throw unauthorized();
@@ -37,7 +37,7 @@ fornecedoresRouter.get('/cnpj/:cnpj', async (req, res) => {
   res.status(200).json(dados);
 });
 
-fornecedoresRouter.patch('/:id', requireSameOrigin, async (req, res) => {
+fornecedoresRouter.patch('/:id', requireSameOrigin, requireRole(WRITE_ROLES), async (req, res) => {
   const { user } = req;
   const { id } = req.params;
   if (!user || typeof id !== 'string') {
